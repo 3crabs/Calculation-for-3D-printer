@@ -1,10 +1,15 @@
 import unittest
 
+from src.core import calc_width_insulation_material
+
+data = [
+    {"waiting": 1, "in": {}},
+]
+
 
 class TestCore(unittest.TestCase):
 
-    def test_1(self):
-        self.assertEqual(1, 1)
-
-    def test_2(self):
-        self.assertEqual(1, 2)
+    def test_table(self):
+        for d in data:
+            w = calc_width_insulation_material(d["in"])
+            self.assertEqual(w, d["waiting"])
