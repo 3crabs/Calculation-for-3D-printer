@@ -39,6 +39,7 @@ def read_file(file_path: str) -> list:
 
 def get_regions_list():
     regions = {}
+    cities = {}
     for row in list(read_file("../resources/cities.xlsx"))[1:]:
         region = row[0].value
         city = row[1].value
@@ -46,10 +47,12 @@ def get_regions_list():
         temperature = row[3].value
         if region not in regions:
             regions[region] = {"cities": []}
-        regions[region]["cities"].append({"city": city,
-                                          "count_days": count_days,
-                                          "temperature": temperature})
-    return regions
+        c = {"city": city,
+             "count_days": count_days,
+             "temperature": temperature}
+        regions[region]["cities"].append(c)
+        cities[city] = c
+    return regions, cities
 
 
 def get_materials_list():
@@ -58,7 +61,6 @@ def get_materials_list():
         material = row[0].value
         coefficient = row[1].value
         materials[material] = coefficient
-    print(materials)
     return materials
 
 
@@ -66,30 +68,19 @@ def mm2m(mm):
     return mm / 1000
 
 
-def calc_layer_1(i: Input):
-    return mm2m(i.width_print_layer) / 1.5
-
-
-def calc_layer_3(i: Input):
-    return mm2m(i.width_print_layer) / 1.5
-
-
-def calc_layer_4(i: Input):
-    return mm2m(i.width_print_layer) / 1.5
-
-
-def calc_layer_5(i: Input):
-    return mm2m(i.width_construction_layer) / 1.5
-
-
-def calc_layer_6(i: Input):
-    return mm2m(i.width_print_layer) / 1.5
+def calc_layers(i: Input):
+    l7 = 0
+    if i.wall_type == WallType.STRONG:
+        l7 = i.width_print_layer
+    l5 = i.width_construction_layer
+    return mm2m(4 * i.width_print_layer + l5 + l7) / 1.5
 
 
 def calc_width_insulation_material(i: Input):
-    temperature_out = -7.5
-    count_days = 214
-    lambda2 = 0.052
+    c = cities[i.city]
+    temperature_out = c['temperature']
+    count_days = c['count_days']
+    lambda2 = materials[i.insulation_material]
 
     gcop = (i.temperature - temperature_out) * count_days
     a = 0.00035
@@ -97,13 +88,9 @@ def calc_width_insulation_material(i: Input):
     r = a * gcop + b
 
     x = Symbol('x')
-    res = solve(1 / 8.7 +
-                calc_layer_1(i) +
-                mm2m(x) / lambda2 +
-                calc_layer_3(i) +
-                calc_layer_4(i) +
-                calc_layer_5(i) +
-                calc_layer_6(i) +
-                1 / 23 - r,
-                x)
+    res = solve(1 / 8.7 + calc_layers(i) + mm2m(x) / lambda2 + 1 / 23 - r, x)
     return res[0]
+
+
+regions, cities = get_regions_list()
+materials = get_materials_list()

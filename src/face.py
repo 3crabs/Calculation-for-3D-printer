@@ -1,10 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 
-from src.core import get_regions_list, get_materials_list
-
-regions = get_regions_list()
-materials = get_materials_list()
+from src.core import regions, materials
 
 window = Tk()
 regions_combobox = ttk.Combobox(window, values=sorted(list(regions)), width=30, state='readonly')
