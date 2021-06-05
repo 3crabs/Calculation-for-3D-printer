@@ -65,6 +65,24 @@ def get_materials_list():
 
 def calc_width_insulation_material(i: Input):
     x = Symbol('x')
-    res = solve(x ** 2 - 1, x)
+
+    a = 0.00035
+    b = 1.4
+    temperature_out = -7.5
+    count_days = 214
+    GCOP = (i.temperature - temperature_out) * count_days
+    R = a * GCOP + b
+
+    res = float()
+    lambda1 = 1.5
+    L1 = i.width_print_layer  # L1 = L3 = L5
+    L4 = i.width_construction_layer
+
+    lambda2 = 0.052
+
+    if i.wall_type == WallType.STRONG:
+        res = solve(1/8.7 + L1/lambda1 + x/lambda2 + L1/lambda1 + L4/lambda1, L1/lambda1 + 1/23 - R)
+    if i.wall_type == WallType.STRETCH:
+        res = solve(1/8.7 + L1/lambda1 + x / lambda2 + L4/lambda1, L1/lambda1 + 1/23 - R)
     print(res)
     return 1
