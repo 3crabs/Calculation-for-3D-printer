@@ -1,9 +1,9 @@
 from tkinter import *
-from tkinter import ttk
+from tkinter import ttk, messagebox
 
 from PIL import Image, ImageTk
 
-from src.core import regions, materials, WallType
+from src.core import regions, materials, WallType, Input, calc_width_insulation_material
 
 window = Tk()
 first_data_group = LabelFrame(window, text='Параметры среды')
@@ -20,16 +20,18 @@ temperature_input = Entry(first_data_group, textvariable=temperature_str, width=
 temperature_unit_label = ttk.Label(first_data_group, width=3, text='°C')
 
 humidity_str = StringVar()
-humidity_label = ttk.Label(first_data_group, width=30, text='Относительная влажность внутри помещения')
+humidity_label = ttk.Label(first_data_group, width=60, text='Относительная влажность внутри помещения')
 humidity_input = Entry(first_data_group, textvariable=humidity_str, width=15)
 humidity_unit_label = ttk.Label(first_data_group, width=3, text='%')
 
-second_data_group = LabelFrame(window, text='Параметры стены', height=130)
+second_data_group = LabelFrame(window, text='Параметры стены', height=140)
 
-wall_type = IntVar()
-wall_type.set(WallType.STRETCH)
-checkbutton_left = Radiobutton(second_data_group, text="На гибких связях", value=WallType.STRETCH, variable=wall_type)
-checkbutton_right = Radiobutton(second_data_group, text="На жестких связях", value=WallType.STRONG, variable=wall_type)
+wall_type_str = IntVar()
+wall_type_str.set(WallType.STRETCH.value)
+checkbutton_left = Radiobutton(second_data_group, text="На гибких связях", value=WallType.STRETCH.value,
+                               variable=wall_type_str)
+checkbutton_right = Radiobutton(second_data_group, text="На жестких связях", value=WallType.STRONG.value,
+                                variable=wall_type_str)
 
 materials_combobox = ttk.Combobox(second_data_group, values=sorted(list(materials)), width=40, state='readonly')
 material_label = ttk.Label(second_data_group, width=30, text='Утеплитель')
@@ -44,6 +46,8 @@ width_construction_layer_label = ttk.Label(second_data_group, width=30, text='Т
 width_construction_layer_input = Entry(second_data_group, textvariable=width_construction_layer_str, width=15)
 width_construction_layer_unit_label = ttk.Label(second_data_group, width=3, text='мм')
 
+answer_label = Label(window, text='Тут будет ответ')
+
 
 def region_combobox_selector(arg):
     cities = regions[regions_combobox.get()]['cities']
@@ -55,19 +59,41 @@ def region_combobox_selector(arg):
     city_combobox["state"] = 'readonly'
 
 
+def work():
+    city = city_combobox.get()
+    temperature = temperature_input.get()
+    humidity = humidity_input.get()
+    wall_type = wall_type_str.get()
+    insulation_material = materials_combobox.get(),
+    insulation_material = list(insulation_material)[0]
+    width_print_layer = width_print_layer_input.get()
+    width_construction_layer = width_construction_layer_input.get()
+    if city == '' or temperature == '' or humidity == '' or insulation_material == '' or width_print_layer == '' or width_construction_layer == '':
+        messagebox.showinfo("Данные не введены", "Заполните все поля и попробуйте снова")
+        answer_label['text'] = 'Тут будет ответ'
+    else:
+        i = Input(city,
+                  float(temperature),
+                  float(humidity),
+                  wall_type,
+                  insulation_material,
+                  float(width_print_layer),
+                  float(width_construction_layer))
+        answer_label['text'] = 'Минимальная толщина утеплителя: ' + str(round(calc_width_insulation_material(i))) + 'мм'
+
+
 def main():
     global window, regions_combobox, city_combobox, materials_combobox
     window.title("Расчет толщины утеплителя для 3D принтера")
-    window.geometry('500x600')
+    window.geometry('500x530')
 
     first_data_group.pack(padx=5, pady=5, expand='yes', fill='both')
 
     second_data_group.pack(padx=5, pady=5, expand='yes', fill='both')
 
-    run_button = Button(window, text='Расчитать толщину утеплителя')
+    run_button = Button(window, text='Расчитать толщину утеплителя', command=work)
     run_button.pack(padx=5, pady=5, fill='both')
 
-    answer_label = Label(window, text='Тут будет ответ')
     answer_label.pack(padx=5, pady=5, fill='both')
 
     regions_label.place(x=10, y=10)
