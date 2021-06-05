@@ -122,14 +122,14 @@ def main():
     humidity_unit_label.place(x=450, y=100)
 
     # Добавим изображение
-    load = Image.open("../resources/stretch.png")
+    load = Image.open("resources/stretch.png")
     load = load.resize((230, 135), Image.ADAPTIVE)
     render = ImageTk.PhotoImage(load)
     img = Label(second_data_group, image=render)
     img.image = render
     img.place(x=0, y=0)
 
-    load = Image.open("../resources/strong.png")
+    load = Image.open("resources/strong.png")
     load = load.resize((230, 135), Image.ADAPTIVE)
     render = ImageTk.PhotoImage(load)
     img = Label(second_data_group, image=render)
@@ -152,7 +152,3 @@ def main():
     width_construction_layer_unit_label.place(x=450, y=240)
 
     window.mainloop()
-
-
-if __name__ == '__main__':
-    main()
