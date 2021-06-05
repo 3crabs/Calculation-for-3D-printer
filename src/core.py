@@ -1,9 +1,8 @@
 from enum import Enum
 
 from openpyxl import load_workbook
-
-from sympy.solvers import solve
 from sympy import Symbol
+from sympy.solvers import solve
 
 
 # тип стены
@@ -63,26 +62,48 @@ def get_materials_list():
     return materials
 
 
-def calc_width_insulation_material(i: Input):
-    x = Symbol('x')
+def mm2m(mm):
+    return mm / 1000
 
-    a = 0.00035
-    b = 1.4
+
+def calc_layer_1(i: Input):
+    return mm2m(i.width_print_layer) / 1.5
+
+
+def calc_layer_3(i: Input):
+    return mm2m(i.width_print_layer) / 1.5
+
+
+def calc_layer_4(i: Input):
+    return mm2m(i.width_print_layer) / 1.5
+
+
+def calc_layer_5(i: Input):
+    return mm2m(i.width_construction_layer) / 1.5
+
+
+def calc_layer_6(i: Input):
+    return mm2m(i.width_print_layer) / 1.5
+
+
+def calc_width_insulation_material(i: Input):
     temperature_out = -7.5
     count_days = 214
-    GCOP = (i.temperature - temperature_out) * count_days
-    R = a * GCOP + b
-
-    res = float()
-    lambda1 = 1.5
-    L1 = i.width_print_layer  # L1 = L3 = L5
-    L4 = i.width_construction_layer
-
     lambda2 = 0.052
 
-    if i.wall_type == WallType.STRONG:
-        res = solve(1/8.7 + L1/lambda1 + x/lambda2 + L1/lambda1 + L4/lambda1, L1/lambda1 + 1/23 - R)
-    if i.wall_type == WallType.STRETCH:
-        res = solve(1/8.7 + L1/lambda1 + x / lambda2 + L4/lambda1, L1/lambda1 + 1/23 - R)
-    print(res)
-    return 1
+    gcop = (i.temperature - temperature_out) * count_days
+    a = 0.00035
+    b = 1.4
+    r = a * gcop + b
+
+    x = Symbol('x')
+    res = solve(1 / 8.7 +
+                calc_layer_1(i) +
+                mm2m(x) / lambda2 +
+                calc_layer_3(i) +
+                calc_layer_4(i) +
+                calc_layer_5(i) +
+                calc_layer_6(i) +
+                1 / 23 - r,
+                x)
+    return res[0]

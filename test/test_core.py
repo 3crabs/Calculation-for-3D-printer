@@ -13,4 +13,4 @@ class TestCore(unittest.TestCase):
     def test_table(self):
         for d in data:
             w = calc_width_insulation_material(d["in"])
-            self.assertEqual(w, d["waiting"])
+            self.assertTrue(abs(w - d["waiting"]) < 1)
