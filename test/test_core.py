@@ -1,9 +1,10 @@
 import unittest
 
-from src.core import calc_width_insulation_material, Input
+from src.core import calc_width_insulation_material, Input, WallType
 
 data = [
-    {"waiting": 1, "in": Input()},
+    {"waiting": 159.6,
+     "in": Input("Барнаул", 21, 0, WallType.STRETCH, "Полистиролбетон (плотность 200 кг/м3)", 60, 240)},
 ]
 
 
