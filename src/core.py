@@ -25,5 +25,5 @@ class Input:
         self.width_construction_layer = width_construction_layer  # толщина конструктивного слоя
 
 
-def calc_width_insulation_material(data):
+def calc_width_insulation_material(i: Input):
     return 1

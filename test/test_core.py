@@ -1,9 +1,9 @@
 import unittest
 
-from src.core import calc_width_insulation_material
+from src.core import calc_width_insulation_material, Input
 
 data = [
-    {"waiting": 1, "in": {}},
+    {"waiting": 1, "in": Input()},
 ]
 
 
