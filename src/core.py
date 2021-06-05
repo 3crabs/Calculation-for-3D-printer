@@ -2,6 +2,9 @@ from enum import Enum
 
 from openpyxl import load_workbook
 
+from sympy.solvers import solve
+from sympy import Symbol
+
 
 # тип стены
 class WallType(Enum):
@@ -61,4 +64,7 @@ def get_materials_list():
 
 
 def calc_width_insulation_material(i: Input):
+    x = Symbol('x')
+    res = solve(x ** 2 - 1, x)
+    print(res)
     return 1
