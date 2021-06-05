@@ -9,17 +9,19 @@ window = Tk()
 first_data_group = LabelFrame(window, text='Параметры среды')
 
 regions_label = ttk.Label(first_data_group, width=30, text='Регион')
-regions_combobox = ttk.Combobox(first_data_group, values=sorted(list(regions)), width=30, state='readonly')
+sregions = sorted(list(regions))
+regions_combobox = ttk.Combobox(first_data_group, values=sregions, width=30, state='readonly')
+regions_combobox.set(sregions[0])
 
 city_label = ttk.Label(first_data_group, width=30, text='Город')
 city_combobox = ttk.Combobox(first_data_group, values=sorted(list(regions)), width=30, state='readonly')
 
-temperature_str = StringVar()
+temperature_str = DoubleVar()
 temperature_label = ttk.Label(first_data_group, width=30, text='Температура внутри помещения')
 temperature_input = Entry(first_data_group, textvariable=temperature_str, width=15)
 temperature_unit_label = ttk.Label(first_data_group, width=3, text='°C')
 
-humidity_str = StringVar()
+humidity_str = DoubleVar()
 humidity_label = ttk.Label(first_data_group, width=60, text='Относительная влажность внутри помещения')
 humidity_input = Entry(first_data_group, textvariable=humidity_str, width=15)
 humidity_unit_label = ttk.Label(first_data_group, width=3, text='%')
@@ -33,15 +35,17 @@ checkbutton_left = Radiobutton(second_data_group, text="На гибких свя
 checkbutton_right = Radiobutton(second_data_group, text="На жестких связях", value=WallType.STRONG.value,
                                 variable=wall_type_str)
 
-materials_combobox = ttk.Combobox(second_data_group, values=sorted(list(materials)), width=40, state='readonly')
 material_label = ttk.Label(second_data_group, width=30, text='Утеплитель')
+smaterials = sorted(list(materials))
+materials_combobox = ttk.Combobox(second_data_group, values=smaterials, width=40, state='readonly')
+materials_combobox.set(smaterials[0])
 
-width_print_layer_str = StringVar()
+width_print_layer_str = DoubleVar()
 width_print_layer_label = ttk.Label(second_data_group, width=30, text='Толщина печатаемого слоя')
 width_print_layer_input = Entry(second_data_group, textvariable=width_print_layer_str, width=15)
 width_print_layer_unit_label = ttk.Label(second_data_group, width=3, text='мм')
 
-width_construction_layer_str = StringVar()
+width_construction_layer_str = DoubleVar()
 width_construction_layer_label = ttk.Label(second_data_group, width=30, text='Толщина конструктивного слоя')
 width_construction_layer_input = Entry(second_data_group, textvariable=width_construction_layer_str, width=15)
 width_construction_layer_unit_label = ttk.Label(second_data_group, width=3, text='мм')
@@ -55,7 +59,7 @@ def region_combobox_selector(arg):
     for city in cities:
         c.append(city['city'])
     city_combobox['values'] = c
-    city_combobox.set('')
+    city_combobox.set(c[0])
     city_combobox["state"] = 'readonly'
 
 
@@ -72,14 +76,19 @@ def work():
         messagebox.showinfo("Данные не введены", "Заполните все поля и попробуйте снова")
         answer_label['text'] = 'Тут будет ответ'
     else:
-        i = Input(city,
-                  float(temperature),
-                  float(humidity),
-                  wall_type,
-                  insulation_material,
-                  float(width_print_layer),
-                  float(width_construction_layer))
-        answer_label['text'] = 'Минимальная толщина утеплителя: ' + str(round(calc_width_insulation_material(i))) + 'мм'
+        try:
+            i = Input(city,
+                      float(temperature),
+                      float(humidity),
+                      wall_type,
+                      insulation_material,
+                      float(width_print_layer),
+                      float(width_construction_layer))
+            answer_label['text'] = 'Минимальная толщина утеплителя: ' + \
+                                   str(round(calc_width_insulation_material(i))) + 'мм'
+        except Exception as e:
+            messagebox.showinfo("Данные введены не верно", "Проверьте введенные данные и попробуйте снова")
+            answer_label['text'] = 'Тут будет ответ'
 
 
 def main():
