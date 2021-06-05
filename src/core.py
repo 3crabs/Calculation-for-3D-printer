@@ -18,7 +18,7 @@ class Input:
                  insulation_material: str,
                  width_print_layer: float,
                  width_construction_layer: float):
-        self.city = city  # регион/город
+        self.city = city  # город
         self.temperature = temperature  # температура внутри помещения
         self.humidity = humidity  # относительная влажность внутри помещения
         self.wall_type = wall_type  # тип стены
@@ -37,7 +37,7 @@ def read_file(file_path: str) -> list:
 
 def get_regions_list():
     regions = {}
-    for row in list(read_file("../resorces/cities.xlsx"))[1:]:
+    for row in list(read_file("../resources/cities.xlsx"))[1:]:
         region = row[0].value
         city = row[1].value
         count_days = row[2].value
@@ -48,6 +48,16 @@ def get_regions_list():
                                           "count_days": count_days,
                                           "temperature": temperature})
     return regions
+
+
+def get_materials_list():
+    materials = {}
+    for row in list(read_file("../resources/material.xlsx"))[1:]:
+        material = row[0].value
+        coefficient = row[1].value
+        materials[material] = coefficient
+    print(materials)
+    return materials
 
 
 def calc_width_insulation_material(i: Input):
